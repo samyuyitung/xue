@@ -313,7 +313,6 @@ export function createCombinedForecastTable(resortData, metrics) {
 
     const resortCell = document.createElement('td');
     resortCell.className = 'resort-name-cell';
-    resortCell.colSpan = firstData.slots.length + 1;
 
     const link = document.createElement('a');
     link.href = `https://forecast.weather.gov/MapClick.php?lat=${resort.lat}&lon=${resort.lon}`;
@@ -322,6 +321,14 @@ export function createCombinedForecastTable(resortData, metrics) {
     link.textContent = resort.name;
     resortCell.appendChild(link);
     resortRow.appendChild(resortCell);
+
+    // Empty cells to fill the row
+    for (let i = 0; i < firstData.slots.length; i++) {
+      const emptyCell = document.createElement('td');
+      emptyCell.className = 'resort-header-empty';
+      resortRow.appendChild(emptyCell);
+    }
+
     tbody.appendChild(resortRow);
 
     // Metric rows for this resort

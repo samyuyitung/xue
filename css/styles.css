@@ -1,4 +1,4 @@
-/* Washington Ski Resort Weather Styles */
+/* Washington Ski Resort Weather Styles - Light Theme */
 
 * {
   box-sizing: border-box;
@@ -8,30 +8,30 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  color: #e0e0e0;
+  background: #f5f7fa;
+  color: #333;
   min-height: 100vh;
   line-height: 1.3;
 }
 
 /* Header */
 header {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
+  background: #fff;
   padding: 0.5rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid #ddd;
   position: sticky;
   top: 0;
   z-index: 100;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 header h1 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #fff;
+  color: #333;
 }
 
 .header-controls {
@@ -42,7 +42,7 @@ header h1 {
 
 #last-updated {
   font-size: 0.75rem;
-  color: #888;
+  color: #666;
 }
 
 #refresh-btn {
@@ -60,6 +60,21 @@ header h1 {
   background: #2980b9;
 }
 
+#unit-toggle {
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: background 0.2s;
+}
+
+#unit-toggle:hover {
+  background: #1e8449;
+}
+
 /* Main content */
 main {
   padding: 1rem;
@@ -68,15 +83,15 @@ main {
 
 /* Resort forecast container */
 .resort-forecast {
-  background: rgba(255, 255, 255, 0.05);
+  background: #fff;
   border-radius: 8px;
   padding: 0.75rem;
   margin-bottom: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid #ddd;
 }
 
 .resort-forecast h2 {
-  color: #fff;
+  color: #333;
   font-size: 1rem;
   margin-bottom: 0.5rem;
   padding-bottom: 0.25rem;
@@ -84,7 +99,7 @@ main {
 }
 
 .resort-forecast h2 a {
-  color: #fff;
+  color: #333;
   text-decoration: none;
   transition: color 0.2s;
 }
@@ -113,10 +128,11 @@ main {
   padding: 0.25rem 0.35rem;
   text-align: center;
   white-space: nowrap;
+  border: 1px solid #e0e0e0;
 }
 
 .forecast-table th {
-  background: rgba(52, 152, 219, 0.2);
+  background: #3498db;
   color: #fff;
   font-weight: 500;
   position: sticky;
@@ -128,15 +144,16 @@ main {
   text-align: left;
   position: sticky;
   left: 0;
-  background: #1a1a2e;
-  z-index: 10;
+  background: #fff;
+  z-index: 5;
   min-width: 100px;
   font-weight: 500;
-  z-index: 5;
+  color: #333;
 }
 
 .metric-header {
-  background: rgba(52, 152, 219, 1);
+  background: #3498db !important;
+  color: #fff;
 }
 
 .time-header {
@@ -144,30 +161,27 @@ main {
 }
 
 .day-header {
-  background: rgba(52, 152, 219, 0.4);
+  background: #2980b9;
   font-weight: 600;
   font-size: 0.75rem;
-  border-left: 2px solid rgba(255, 255, 255, 0.3);
+  border-left: 2px solid #fff;
 }
 
 .day-header:first-of-type {
-  border-left: none;
+  border-left: 1px solid #e0e0e0;
 }
 
 .day-start {
-  border-left: 2px solid rgba(255, 255, 255, 0.3);
+  border-left: 2px solid #ccc;
 }
 
 /* Combined table resort headers */
 .combined-forecast {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
   padding: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .resort-header-row {
-  background: rgba(52, 152, 219, 0.3);
+  background: #f5f7fa;
 }
 
 .resort-name-cell {
@@ -175,11 +189,20 @@ main {
   font-weight: 600;
   font-size: 0.875rem;
   padding: 0.5rem;
-  color: #fff;
+  position: sticky;
+  left: 0;
+  background: #f5f7fa;
+  z-index: 5;
+  border: none !important;
+}
+
+.resort-header-empty {
+  background: #f5f7fa;
+  border: none !important;
 }
 
 .resort-name-cell a {
-  color: #fff;
+  color: #000;
   text-decoration: none;
 }
 
@@ -190,76 +213,76 @@ main {
 
 /* Metric rows */
 .metric-row:nth-child(even) {
-  background: rgba(255, 255, 255, 0.02);
+  background: #f9f9f9;
 }
 
 .metric-row:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: #f0f0f0;
 }
 
 .metric-value {
   font-variant-numeric: tabular-nums;
 }
 
-/* Temperature colors */
+/* Temperature colors - using opacity for data cells */
 .temp-freezing {
-  background: rgba(155, 89, 182, 0.3);
-  color: #d4b8e0;
+  background: rgba(155, 89, 182, 0.25);
+  color: #6b3a7d;
 }
 
 .temp-cold {
-  background: rgba(52, 152, 219, 0.3);
-  color: #a8d4f0;
+  background: rgba(52, 152, 219, 0.25);
+  color: #1a5276;
 }
 
 .temp-cool {
   background: rgba(46, 204, 113, 0.2);
-  color: #a8e6cf;
+  color: #1e7e34;
 }
 
 .temp-mild {
-  background: rgba(241, 196, 15, 0.2);
-  color: #f9e79f;
+  background: rgba(241, 196, 15, 0.25);
+  color: #9a7b0a;
 }
 
 /* Wind colors */
 .wind-light {
-  color: #a8e6cf;
+  color: #27ae60;
 }
 
 .wind-moderate {
-  color: #f9e79f;
+  color: #b7950b;
 }
 
 .wind-high {
-  background: rgba(230, 126, 34, 0.3);
-  color: #f5b87a;
+  background: rgba(230, 126, 34, 0.25);
+  color: #a04000;
 }
 
 .wind-extreme {
-  background: rgba(231, 76, 60, 0.4);
-  color: #f5a6a0;
+  background: rgba(231, 76, 60, 0.3);
+  color: #922b21;
 }
 
 /* Condition colors */
 .condition-snow {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
+  background: rgba(155, 89, 182, 0.15);
+  color: #6b3a7d;
   font-weight: 500;
 }
 
 .condition-rain {
-  background: rgba(52, 152, 219, 0.2);
-  color: #a8d4f0;
+  background: rgba(52, 152, 219, 0.15);
+  color: #1a5276;
 }
 
 .condition-cloudy {
-  color: #bbb;
+  color: #666;
 }
 
 .condition-sunny {
-  background: rgba(241, 196, 15, 0.15);
-  color: #f9e79f;
+  background: rgba(241, 196, 15, 0.2);
+  color: #9a7b0a;
 }
 
 /* Loading states */
@@ -270,7 +293,7 @@ main {
   align-items: center;
   justify-content: center;
   padding: 3rem;
-  color: #888;
+  color: #666;
 }
 
 .loading-spinner {
@@ -282,7 +305,7 @@ main {
 .spinner {
   width: 24px;
   height: 24px;
-  border: 3px solid rgba(255, 255, 255, 0.1);
+  border: 3px solid #e0e0e0;
   border-top-color: #3498db;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -303,7 +326,7 @@ main {
 
 .resort-error h2,
 .global-error h2 {
-  color: #fff;
+  color: #333;
   margin-bottom: 1rem;
 }
 
@@ -312,7 +335,7 @@ main {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  color: #e74c3c;
+  color: #c0392b;
   background: rgba(231, 76, 60, 0.1);
   padding: 1rem;
   border-radius: 8px;
@@ -343,7 +366,7 @@ footer {
   padding: 2rem;
   color: #666;
   font-size: 0.875rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid #ddd;
 }
 
 footer a {

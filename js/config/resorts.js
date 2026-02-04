@@ -3,16 +3,16 @@
 
 export const resorts = [
   {
+    id: 'mt-baker',
+    name: 'Mt. Baker',
+    lat: 48.8570,
+    lon: -121.6675
+  },
+  {
     id: 'stevens-pass',
     name: 'Stevens Pass',
     lat: 47.7448,
     lon: -121.0890
-  },
-  {
-    id: 'crystal-mountain',
-    name: 'Crystal Mountain',
-    lat: 46.9282,
-    lon: -121.5045
   },
   {
     id: 'snoqualmie-pass',
@@ -21,10 +21,10 @@ export const resorts = [
     lon: -121.4134
   },
   {
-    id: 'mt-baker',
-    name: 'Mt. Baker',
-    lat: 48.8570,
-    lon: -121.6675
+    id: 'crystal-mountain',
+    name: 'Crystal Mountain',
+    lat: 46.9282,
+    lon: -121.5045
   },
   {
     id: 'white-pass',

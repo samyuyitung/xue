@@ -1,7 +1,7 @@
 // Main application entry point
 
 import { resorts } from './config/resorts.js';
-import { metrics } from './config/metrics.js';
+import { getMetrics } from './config/metrics.js';
 import { fetchAllForecasts } from './api/weatherApi.js';
 import { transformForecast } from './data/forecastTransformer.js';
 import {
@@ -15,6 +15,8 @@ const REFRESH_INTERVAL = 30 * 60 * 1000; // 30 minutes
 
 let container;
 let lastUpdate = null;
+let cachedResults = null;
+let unitSystem = 'imperial';
 
 /**
  * Update the last updated timestamp display
@@ -31,40 +33,62 @@ function updateTimestamp() {
 }
 
 /**
+ * Update the unit toggle button text
+ */
+function updateToggleButton() {
+  const toggleBtn = document.getElementById('unit-toggle');
+  if (toggleBtn) {
+    // Show what clicking will switch TO
+    toggleBtn.textContent = unitSystem === 'imperial' ? 'Metric' : 'Imperial';
+  }
+}
+
+/**
+ * Render the forecast table with current unit system
+ */
+function renderForecast() {
+  if (!cachedResults) return;
+
+  clearContainer(container);
+
+  const metrics = getMetrics(unitSystem);
+
+  // Separate successful and failed results
+  const successfulResults = [];
+  const failedResults = [];
+
+  cachedResults.forEach(result => {
+    if (result.error) {
+      failedResults.push(result);
+    } else {
+      const transformedData = transformForecast(result.periods, metrics);
+      successfulResults.push({ resort: result.resort, transformedData });
+    }
+  });
+
+  // Show errors first
+  failedResults.forEach(result => {
+    const element = createErrorElement(result.resort.name, result.error);
+    container.appendChild(element);
+  });
+
+  // Create combined table for successful results
+  if (successfulResults.length > 0) {
+    const combinedTable = createCombinedForecastTable(successfulResults, metrics);
+    container.appendChild(combinedTable);
+  }
+}
+
+/**
  * Load and display forecasts for all resorts
  */
 async function loadForecasts() {
   showLoading(container);
 
   try {
-    const results = await fetchAllForecasts(resorts);
+    cachedResults = await fetchAllForecasts(resorts);
 
-    clearContainer(container);
-
-    // Separate successful and failed results
-    const successfulResults = [];
-    const failedResults = [];
-
-    results.forEach(result => {
-      if (result.error) {
-        failedResults.push(result);
-      } else {
-        const transformedData = transformForecast(result.periods, metrics);
-        successfulResults.push({ resort: result.resort, transformedData });
-      }
-    });
-
-    // Show errors first
-    failedResults.forEach(result => {
-      const element = createErrorElement(result.resort.name, result.error);
-      container.appendChild(element);
-    });
-
-    // Create combined table for successful results
-    if (successfulResults.length > 0) {
-      const combinedTable = createCombinedForecastTable(successfulResults, metrics);
-      container.appendChild(combinedTable);
-    }
+    renderForecast();
 
     lastUpdate = new Date();
     updateTimestamp();
@@ -83,6 +107,15 @@ async function loadForecasts() {
 }
 
 /**
+ * Toggle between imperial and metric units
+ */
+function toggleUnits() {
+  unitSystem = unitSystem === 'imperial' ? 'metric' : 'imperial';
+  updateToggleButton();
+  renderForecast();
+}
+
+/**
  * Initialize the application
  */
 function init() {
@@ -92,6 +125,9 @@ function init() {
     console.error('Forecast container not found');
     return;
   }
+
+  // Initialize toggle button
+  updateToggleButton();
 
   // Load forecasts immediately
   loadForecasts();
@@ -103,6 +139,12 @@ function init() {
   const refreshBtn = document.getElementById('refresh-btn');
   if (refreshBtn) {
     refreshBtn.addEventListener('click', loadForecasts);
+  }
+
+  // Set up unit toggle button
+  const toggleBtn = document.getElementById('unit-toggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', toggleUnits);
   }
 }
 
