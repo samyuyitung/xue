@@ -5,9 +5,8 @@ import { metrics } from './config/metrics.js';
 import { fetchAllForecasts } from './api/weatherApi.js';
 import { transformForecast } from './data/forecastTransformer.js';
 import {
-  createForecastTable,
+  createCombinedForecastTable,
   createErrorElement,
-  createLoadingElement,
   clearContainer,
   showLoading
 } from './ui/tableRenderer.js';
@@ -42,18 +41,30 @@ async function loadForecasts() {
 
     clearContainer(container);
 
-    results.forEach(result => {
-      let element;
+    // Separate successful and failed results
+    const successfulResults = [];
+    const failedResults = [];
 
+    results.forEach(result => {
       if (result.error) {
-        element = createErrorElement(result.resort.name, result.error);
+        failedResults.push(result);
       } else {
         const transformedData = transformForecast(result.periods, metrics);
-        element = createForecastTable(result.resort, transformedData, metrics);
+        successfulResults.push({ resort: result.resort, transformedData });
       }
+    });
 
+    // Show errors first
+    failedResults.forEach(result => {
+      const element = createErrorElement(result.resort.name, result.error);
       container.appendChild(element);
     });
+
+    // Create combined table for successful results
+    if (successfulResults.length > 0) {
+      const combinedTable = createCombinedForecastTable(successfulResults, metrics);
+      container.appendChild(combinedTable);
+    }
 
     lastUpdate = new Date();
     updateTimestamp();

@@ -124,30 +124,64 @@ export function createForecastTable(resort, transformedData, metrics) {
   const table = document.createElement('table');
   table.className = 'forecast-table';
 
-  // Create header row with time slots
+  // Create header rows with day and time slots
   const thead = document.createElement('thead');
-  const headerRow = document.createElement('tr');
 
-  // Empty cell for metric labels column
-  const cornerCell = document.createElement('th');
-  cornerCell.className = 'metric-header';
-  headerRow.appendChild(cornerCell);
+  // First row: Day headers (merged)
+  const dayRow = document.createElement('tr');
+  const dayCornerCell = document.createElement('th');
+  dayCornerCell.className = 'metric-header';
+  dayCornerCell.rowSpan = 2;
+  dayRow.appendChild(dayCornerCell);
 
-  // Time slot headers
+  // Group slots by day and create merged headers
+  let currentDay = null;
+  let dayColSpan = 0;
+  let dayCell = null;
+
+  transformedData.slots.forEach((slot, index) => {
+    if (slot.dayLabel !== currentDay) {
+      // Save previous day cell if exists
+      if (dayCell) {
+        dayCell.colSpan = dayColSpan;
+        dayRow.appendChild(dayCell);
+      }
+      // Start new day
+      currentDay = slot.dayLabel;
+      dayColSpan = 1;
+      dayCell = document.createElement('th');
+      dayCell.className = 'day-header';
+      dayCell.textContent = slot.dayLabel;
+    } else {
+      dayColSpan++;
+    }
+
+    // Handle last slot
+    if (index === transformedData.slots.length - 1 && dayCell) {
+      dayCell.colSpan = dayColSpan;
+      dayRow.appendChild(dayCell);
+    }
+  });
+
+  thead.appendChild(dayRow);
+
+  // Second row: Time slot headers
+  const timeRow = document.createElement('tr');
+
   transformedData.slots.forEach((slot, index) => {
     const th = document.createElement('th');
     th.className = 'time-header';
-    th.textContent = slot.label;
+    th.textContent = slot.timeLabel;
 
-    // Add day separator class
-    if (index > 0 && index % 6 === 0) {
+    // Add day separator class at day boundaries
+    if (index > 0 && slot.dayLabel !== transformedData.slots[index - 1].dayLabel) {
       th.classList.add('day-start');
     }
 
-    headerRow.appendChild(th);
+    timeRow.appendChild(th);
   });
 
-  thead.appendChild(headerRow);
+  thead.appendChild(timeRow);
   table.appendChild(thead);
 
   // Create body with metric rows
@@ -176,8 +210,8 @@ export function createForecastTable(resort, transformedData, metrics) {
         cell.classList.add(cellClass);
       }
 
-      // Add day separator class
-      if (index > 0 && index % 6 === 0) {
+      // Add day separator class at day boundaries
+      if (index > 0 && transformedData.slots[index].dayLabel !== transformedData.slots[index - 1].dayLabel) {
         cell.classList.add('day-start');
       }
 
@@ -185,6 +219,141 @@ export function createForecastTable(resort, transformedData, metrics) {
     });
 
     tbody.appendChild(row);
+  });
+
+  table.appendChild(tbody);
+  tableWrapper.appendChild(table);
+  container.appendChild(tableWrapper);
+
+  return container;
+}
+
+/**
+ * Create a combined forecast table for all resorts
+ * @param {Array} resortData - Array of {resort, transformedData} objects
+ * @param {Array} metrics
+ * @returns {HTMLElement}
+ */
+export function createCombinedForecastTable(resortData, metrics) {
+  const container = document.createElement('div');
+  container.className = 'combined-forecast';
+
+  const tableWrapper = document.createElement('div');
+  tableWrapper.className = 'table-wrapper';
+
+  const table = document.createElement('table');
+  table.className = 'forecast-table';
+
+  // Use first resort's data for header structure
+  const firstData = resortData[0].transformedData;
+
+  // Create header rows with day and time slots
+  const thead = document.createElement('thead');
+
+  // First row: Day headers (merged)
+  const dayRow = document.createElement('tr');
+  const dayCornerCell = document.createElement('th');
+  dayCornerCell.className = 'metric-header';
+  dayCornerCell.rowSpan = 2;
+  dayRow.appendChild(dayCornerCell);
+
+  // Group slots by day and create merged headers
+  let currentDay = null;
+  let dayColSpan = 0;
+  let dayCell = null;
+
+  firstData.slots.forEach((slot, index) => {
+    if (slot.dayLabel !== currentDay) {
+      if (dayCell) {
+        dayCell.colSpan = dayColSpan;
+        dayRow.appendChild(dayCell);
+      }
+      currentDay = slot.dayLabel;
+      dayColSpan = 1;
+      dayCell = document.createElement('th');
+      dayCell.className = 'day-header';
+      dayCell.textContent = slot.dayLabel;
+    } else {
+      dayColSpan++;
+    }
+
+    if (index === firstData.slots.length - 1 && dayCell) {
+      dayCell.colSpan = dayColSpan;
+      dayRow.appendChild(dayCell);
+    }
+  });
+
+  thead.appendChild(dayRow);
+
+  // Second row: Time slot headers
+  const timeRow = document.createElement('tr');
+
+  firstData.slots.forEach((slot, index) => {
+    const th = document.createElement('th');
+    th.className = 'time-header';
+    th.textContent = slot.timeLabel;
+
+    if (index > 0 && slot.dayLabel !== firstData.slots[index - 1].dayLabel) {
+      th.classList.add('day-start');
+    }
+
+    timeRow.appendChild(th);
+  });
+
+  thead.appendChild(timeRow);
+  table.appendChild(thead);
+
+  // Create body with all resorts
+  const tbody = document.createElement('tbody');
+
+  resortData.forEach(({ resort, transformedData }) => {
+    // Resort name row
+    const resortRow = document.createElement('tr');
+    resortRow.className = 'resort-header-row';
+
+    const resortCell = document.createElement('td');
+    resortCell.className = 'resort-name-cell';
+    resortCell.colSpan = firstData.slots.length + 1;
+
+    const link = document.createElement('a');
+    link.href = `https://forecast.weather.gov/MapClick.php?lat=${resort.lat}&lon=${resort.lon}`;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.textContent = resort.name;
+    resortCell.appendChild(link);
+    resortRow.appendChild(resortCell);
+    tbody.appendChild(resortRow);
+
+    // Metric rows for this resort
+    metrics.forEach(metric => {
+      const row = document.createElement('tr');
+      row.className = `metric-row metric-${metric.id}`;
+
+      const labelCell = document.createElement('td');
+      labelCell.className = 'metric-label';
+      labelCell.textContent = metric.label;
+      row.appendChild(labelCell);
+
+      const metricValues = transformedData.metricData[metric.id];
+      metricValues.forEach((data, index) => {
+        const cell = document.createElement('td');
+        cell.className = 'metric-value';
+        cell.textContent = data.formattedValue;
+
+        const cellClass = getCellClass(metric.id, data.value);
+        if (cellClass) {
+          cell.classList.add(cellClass);
+        }
+
+        if (index > 0 && transformedData.slots[index].dayLabel !== transformedData.slots[index - 1].dayLabel) {
+          cell.classList.add('day-start');
+        }
+
+        row.appendChild(cell);
+      });
+
+      tbody.appendChild(row);
+    });
   });
 
   table.appendChild(tbody);

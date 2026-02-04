@@ -4,26 +4,24 @@
 export const metrics = [
   {
     id: 'temperature',
-    label: 'Temperature',
+    label: 'Temperature (F)',
     unit: '°F',
     extract: (period) => period.temperature,
-    format: (value) => value !== null ? `${Math.round(value)}°F` : '—'
+    format: (value) => value !== null ? `${Math.round(value)}°` : '—'
   },
   {
     id: 'wind',
-    label: 'Wind',
-    unit: '',
+    label: 'Wind (mph)',
+    unit: 'mph',
     extract: (period) => {
       // Wind speed comes as "15 mph" string, parse the number
       const match = period.windSpeed?.match(/(\d+)/);
       const speed = match ? parseInt(match[1], 10) : null;
-      const direction = period.windDirection || null;
-      return { speed, direction };
+      return { speed };
     },
     format: (value) => {
       if (!value || value.speed === null) return '—';
-      const dir = value.direction || '';
-      return `${Math.round(value.speed)} mph ${dir}`.trim();
+      return `${Math.round(value.speed)}`;
     }
   },
   {
@@ -38,11 +36,31 @@ export const metrics = [
     label: 'Conditions',
     unit: '',
     extract: (period) => period.shortForecast,
-    format: (value) => value || '—'
+    format: (value) => {
+      if (!value) return '—';
+      const lower = value.toLowerCase();
+
+      // Check for specific conditions (order matters - more specific first)
+      if (lower.includes('thunder')) return '⛈️';
+      if (lower.includes('blizzard')) return '🌨️';
+      if (lower.includes('snow') && lower.includes('rain')) return '🌨️🌧️';
+      if (lower.includes('freezing rain') || lower.includes('sleet')) return '🌧️❄️';
+      if (lower.includes('snow')) return '❄️';
+      if (lower.includes('rain') || lower.includes('showers')) return '🌧️';
+      if (lower.includes('fog') || lower.includes('mist')) return '🌫️';
+      if (lower.includes('partly cloudy') || lower.includes('partly sunny')) return '⛅';
+      if (lower.includes('mostly cloudy')) return '🌥️';
+      if (lower.includes('cloud') || lower.includes('overcast')) return '☁️';
+      if (lower.includes('sunny') || lower.includes('clear')) return '☀️';
+      if (lower.includes('wind')) return '💨';
+
+      // Fallback to original text if no match
+      return value;
+    }
   },
   {
     id: 'snow-level',
-    label: 'Snow Level',
+    label: 'Snow Level (ft)',
     unit: 'ft',
     extract: (period) => {
       // Estimate snow level from temperature
@@ -54,6 +72,6 @@ export const metrics = [
       const snowLevel = 5000 + (temp - 32) * 200;
       return Math.max(0, Math.min(10000, snowLevel));
     },
-    format: (value) => value !== null ? `${Math.round(value).toLocaleString()} ft` : '—'
+    format: (value) => value !== null ? `${Math.round(value).toLocaleString()}` : '—'
   }
 ];

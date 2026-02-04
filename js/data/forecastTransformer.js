@@ -20,6 +20,31 @@ function formatSlotLabel(date) {
 }
 
 /**
+ * Format just the time portion of a slot
+ * @param {Date} date
+ * @returns {string} e.g., "8AM"
+ */
+function formatTimeLabel(date) {
+  let hours = date.getHours();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12 || 12;
+  return `${hours}${ampm}`;
+}
+
+/**
+ * Format just the day portion of a slot with date
+ * @param {Date} date
+ * @returns {string} e.g., "Mon (1/7)"
+ */
+function formatDayLabel(date) {
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const dayName = days[date.getDay()];
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  return `${dayName} (${month}/${day})`;
+}
+
+/**
  * Get the mode (most common value) from an array
  * @param {Array} arr
  * @returns {*} Most common value
@@ -116,6 +141,8 @@ function groupIntoSlots(periods) {
     slots.push({
       startTime: slotStartTime,
       label: formatSlotLabel(slotStartTime),
+      timeLabel: formatTimeLabel(slotStartTime),
+      dayLabel: formatDayLabel(slotStartTime),
       periods: slotPeriods
     });
   }
