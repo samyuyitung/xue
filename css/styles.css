@@ -285,6 +285,42 @@ main {
   color: #9a7b0a;
 }
 
+/* Snow amount colors */
+.snow-light {
+  background: rgba(174, 214, 241, 0.3);
+  color: #2471a3;
+}
+
+.snow-moderate {
+  background: rgba(52, 152, 219, 0.3);
+  color: #1a5276;
+  font-weight: 500;
+}
+
+.snow-heavy {
+  background: rgba(155, 89, 182, 0.35);
+  color: #6b3a7d;
+  font-weight: 600;
+}
+
+/* Rain amount colors */
+.rain-light {
+  background: rgba(46, 204, 113, 0.2);
+  color: #1e7e34;
+}
+
+.rain-moderate {
+  background: rgba(52, 152, 219, 0.25);
+  color: #1a5276;
+  font-weight: 500;
+}
+
+.rain-heavy {
+  background: rgba(41, 128, 185, 0.35);
+  color: #154360;
+  font-weight: 600;
+}
+
 /* Loading states */
 .global-loading,
 .resort-loading {

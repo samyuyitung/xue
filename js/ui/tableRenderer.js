@@ -79,6 +79,30 @@ function getConditionsClass(conditions) {
 }
 
 /**
+ * Get CSS class for snow amount value (in mm)
+ * @param {number} value - Snow amount in mm
+ * @returns {string}
+ */
+function getSnowAmountClass(value) {
+  if (value === null || value === 0) return '';
+  if (value >= 50) return 'snow-heavy';     // ~2+ inches
+  if (value >= 25) return 'snow-moderate';  // ~1+ inch
+  return 'snow-light';                      // trace to ~1 inch
+}
+
+/**
+ * Get CSS class for rain amount value (in mm)
+ * @param {number} value - Rain amount in mm
+ * @returns {string}
+ */
+function getRainAmountClass(value) {
+  if (value === null || value === 0) return '';
+  if (value >= 15) return 'rain-heavy';     // ~0.6+ inches
+  if (value >= 5) return 'rain-moderate';   // ~0.2+ inches
+  return 'rain-light';                      // trace to ~0.2 inches
+}
+
+/**
  * Get cell styling based on metric and value
  * @param {string} metricId
  * @param {*} value
@@ -92,6 +116,10 @@ function getCellClass(metricId, value) {
       return getWindClass(value?.speed);
     case 'conditions':
       return getConditionsClass(value);
+    case 'snow-amount':
+      return getSnowAmountClass(value);
+    case 'rain-amount':
+      return getRainAmountClass(value);
     default:
       return '';
   }

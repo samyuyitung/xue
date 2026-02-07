@@ -82,11 +82,23 @@ function average(arr) {
 }
 
 /**
+ * Sum numeric values, treating nulls as 0
+ * @param {Array<number|null>} arr
+ * @returns {number|null}
+ */
+function sumValues(arr) {
+  const filtered = arr.filter(v => v !== null && v !== undefined && typeof v === 'number');
+  if (filtered.length === 0) return null;
+  return filtered.reduce((sum, v) => sum + v, 0);
+}
+
+/**
  * Aggregate values based on their type
  * @param {Array} values
+ * @param {string} [aggregateMode] - 'sum' to sum numeric values instead of averaging
  * @returns {*} Aggregated value
  */
-function aggregateValues(values) {
+function aggregateValues(values, aggregateMode) {
   if (values.length === 0) return null;
 
   const filtered = values.filter(v => v !== null && v !== undefined);
@@ -105,7 +117,7 @@ function aggregateValues(values) {
   // Check if values are numeric
   const numericValues = filtered.filter(v => typeof v === 'number');
   if (numericValues.length === filtered.length) {
-    return average(values);
+    return aggregateMode === 'sum' ? sumValues(values) : average(values);
   }
 
   // For strings and other types, use mode
@@ -159,7 +171,7 @@ function groupIntoSlots(periods) {
 function extractMetricValues(slots, metric) {
   return slots.map(slot => {
     const values = slot.periods.map(period => metric.extract(period));
-    const aggregatedValue = aggregateValues(values);
+    const aggregatedValue = aggregateValues(values, metric.aggregate);
 
     return {
       label: slot.label,

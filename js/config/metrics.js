@@ -26,6 +26,22 @@ function ftToM(ft) {
 }
 
 /**
+ * Convert millimeters to inches
+ */
+function mmToIn(mm) {
+  if (mm === null) return null;
+  return mm / 25.4;
+}
+
+/**
+ * Convert millimeters to centimeters
+ */
+function mmToCm(mm) {
+  if (mm === null) return null;
+  return mm / 10;
+}
+
+/**
  * Get metrics configured for the specified unit system
  * @param {string} unitSystem - 'imperial' or 'metric'
  * @returns {Array} Array of metric definitions
@@ -34,6 +50,30 @@ export function getMetrics(unitSystem = 'imperial') {
   const isMetric = unitSystem === 'metric';
 
   return [
+    {
+      id: 'snow-amount',
+      label: isMetric ? 'Snow (cm)' : 'Snow (in)',
+      unit: isMetric ? 'cm' : 'in',
+      aggregate: 'sum',
+      extract: (period) => period.snowfallAmount ?? null,
+      format: (value) => {
+        if (value === null || value === 0) return '—';
+        const amount = isMetric ? mmToCm(value) : mmToIn(value);
+        return amount < 0.1 ? 'Trace' : `${amount.toFixed(1)}`;
+      }
+    },
+    {
+      id: 'rain-amount',
+      label: isMetric ? 'Rain (mm)' : 'Rain (in)',
+      unit: isMetric ? 'mm' : 'in',
+      aggregate: 'sum',
+      extract: (period) => period.precipAmount ?? null,
+      format: (value) => {
+        if (value === null || value === 0) return '—';
+        const amount = isMetric ? value : mmToIn(value);
+        return amount < 0.1 ? 'Trace' : `${amount.toFixed(1)}`;
+      }
+    },
     {
       id: 'temperature',
       label: isMetric ? 'Temperature (C)' : 'Temperature (F)',
@@ -114,7 +154,7 @@ export function getMetrics(unitSystem = 'imperial') {
         const level = isMetric ? ftToM(value) : value;
         return `${Math.round(level).toLocaleString()}`;
       }
-    }
+    },
   ];
 }
 
